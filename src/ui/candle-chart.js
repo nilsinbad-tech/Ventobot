@@ -2,7 +2,7 @@ export class CandleChart {
   constructor(canvas, emptyEl, statusEl) {
     this.canvas = canvas; this.ctx = canvas.getContext("2d");
     this.emptyEl = emptyEl; this.statusEl = statusEl;
-    this.data = []; this.start = 0; this.visible = 120; this.drag = null;
+    this.data = []; this.start = 0; this.visible = 120; this.drag = null; this.pointers = new Map(); this.pinch = null;
     this.resizeObserver = new ResizeObserver(() => this.draw());
     this.resizeObserver.observe(canvas.parentElement);
     canvas.addEventListener("pointerdown", e => this.pointerDown(e));
@@ -31,16 +31,38 @@ export class CandleChart {
   pointerDown(e) {
     if (!this.data.length) return;
     this.canvas.setPointerCapture(e.pointerId);
-    this.drag = { x:e.clientX, start:this.start };
+    this.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if (this.pointers.size===1) this.drag={x:e.clientX,start:this.start};
+    if (this.pointers.size===2) {
+      const pts=[...this.pointers.values()];
+      this.pinch={distance:Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y),visible:this.visible,start:this.start};
+      this.drag=null;
+    }
   }
   pointerMove(e) {
+    if (!this.pointers.has(e.pointerId)) return;
+    this.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if (this.pointers.size>=2 && this.pinch) {
+      const pts=[...this.pointers.values()], distance=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+      const rect=this.canvas.getBoundingClientRect(), center=((pts[0].x+pts[1].x)/2-rect.left)/rect.width;
+      const next=Math.max(25,Math.min(600,Math.round(this.pinch.visible*this.pinch.distance/Math.max(1,distance))));
+      const anchor=this.pinch.start+center*this.pinch.visible;
+      this.visible=next;
+      this.start=Math.max(0,Math.min(Math.max(0,this.data.length-next),Math.round(anchor-center*next)));
+      this.draw();return;
+    }
     if (!this.drag) return;
     const rect=this.canvas.getBoundingClientRect(), step=rect.width/this.visible;
     const delta=Math.round((this.drag.x-e.clientX)/step);
     this.start=Math.max(0,Math.min(Math.max(0,this.data.length-this.visible),this.drag.start+delta));
     this.draw();
   }
-  pointerUp(){this.drag=null;}
+  pointerUp(e){
+    this.pointers.delete(e.pointerId);
+    if(this.pointers.size<2)this.pinch=null;
+    if(this.pointers.size===1){const point=[...this.pointers.values()][0];this.drag={x:point.x,start:this.start};}
+    else if(!this.pointers.size)this.drag=null;
+  }
   wheel(e) {
     if (!this.data.length) return;
     e.preventDefault();
