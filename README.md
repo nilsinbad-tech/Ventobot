@@ -1,36 +1,43 @@
-# BOTDER
+# VENTOBOT
 
-Proyecto nuevo e independiente para análisis de mercados Deriv y seguimiento manual de señales. Está optimizado como interfaz web móvil.
+Aplicación web móvil independiente para consultar mercados sintéticos de Deriv y llevar un registro manual de operaciones. Este repositorio no modifica el proyecto antiguo `Botder`.
 
-## Estado actual
+## Funciones implementadas
 
-- Interfaz responsive inicial.
-- Panel de instrumentos de volatilidad.
-- Adaptador de datos separado del resto de la aplicación.
-- Motores de estrategia separados conceptualmente.
-- Registro local de operaciones manuales.
-- Pantalla completa para el gráfico.
-- No utiliza velas, precios ni resultados simulados.
-- No envía órdenes al mercado.
+- Lista de 10 instrumentos Volatility disponibles en la respuesta pública de Deriv.
+- Conexión pública WebSocket con reconexión automática.
+- Historial de velas M1 (solicitud de hasta 1.440 velas, 24 horas) y actualización de la vela en curso.
+- Gráfico de velas con desplazamiento horizontal, zoom con rueda y diseño adaptable a móvil.
+- Pantalla completa.
+- Registro manual COMPRAR/VENDER con validación de Entrada, SL, TP1 y TP2.
+- Persistencia local del historial y cierre manual.
+- Cierre automático del seguimiento al tocar SL o TP2. TP1 queda registrado como nivel informativo y no cierra la operación.
+- Dos motores visualmente separados. No emiten señales hasta que las reglas exactas estén implementadas y verificadas.
 
-## Estructura
+## Límites conocidos
 
-- `src/app.js`: interfaz y coordinación.
-- `src/data/deriv-client.js`: conexión de datos.
-- `src/core/operation-book.js`: registro manual.
-- `styles.css`: diseño adaptable.
-- `index.html`: entrada de la aplicación.
+- No envía órdenes, no usa token privado y no conecta una cuenta MT5.
+- La API pública de Deriv y su disponibilidad pueden cambiar; el gráfico debe comprobarse desde el navegador publicado.
+- El adaptador usa el endpoint público WebSocket con app_id público 1089.
+- La lista muestra hasta 10 instrumentos Volatility que devuelve el proveedor; no garantiza que Deriv ofrezca siempre los mismos símbolos.
+- El gráfico conserva hasta 2.000 velas en memoria; solicita 1.440 inicialmente.
+- El historial manual se guarda en el almacenamiento local del navegador/dispositivo, no se sincroniza entre dispositivos.
 
-## Publicar con GitHub Pages
+## Motores de estrategia
 
-En GitHub: Settings → Pages → Build and deployment → Deploy from a branch → `main` → `/ (root)` → Save.
+No se habilitan señales ficticias. El motor de estructura necesita su regla final de confirmación de entrada y definición exacta de zonas. El motor de tres toques requiere validar cómo el usuario define los tres pivotes ZigZag y la línea/canal; no se adopta automáticamente la interpretación de triángulo ni una regla supuesta.
 
-## Pendiente antes de activar señales
+## Ejecutar pruebas
 
-1. Verificar el protocolo de conexión de datos en el entorno publicado y cargar velas históricas M1.
-2. Implementar dibujo de velas, zoom y desplazamiento.
-3. Definir y probar las reglas exactas del motor de estructura/liquidez.
-4. Definir y probar de forma independiente el motor de canal de tres toques.
-5. Unificar el registro de señales, entrada manual, TP/SL e historial con pruebas automatizadas.
+Requiere Node.js 20 o superior:
 
-**Aviso:** esta base es un panel de análisis. No está conectada a ejecución de operaciones reales y no debe interpretarse como un sistema de trading terminado.
+```sh
+npm run check
+npm test
+```
+
+## Publicación
+
+GitHub → Settings → Pages → Build and deployment → GitHub Actions. El workflow de este repositorio publica la raíz cuando hay un push a `main`.
+
+La dirección habitual del sitio será `https://nilsinbad-tech.github.io/Ventobot/` cuando Pages esté habilitado y el workflow termine correctamente.
