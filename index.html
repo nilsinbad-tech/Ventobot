@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1020">
+  <meta name="description" content="BOTDER — panel de análisis y seguimiento manual de señales.">
+  <title>BOTDER</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="BOTDER inicio"><span class="brand-mark">B</span><span>BOTDER</span><small>ANÁLISIS</small></a>
+      <div class="connection"><i id="connection-dot"></i><span id="connection-label">SIN CONEXIÓN</span></div>
+    </header>
+    <main>
+      <section class="intro">
+        <div><p class="eyebrow">DERIV · PANEL DE MERCADO</p><h1>Tu centro de señales</h1><p class="muted">Análisis independiente por estrategia. Las operaciones se registran manualmente.</p></div>
+        <button id="refresh-btn" class="icon-btn" type="button" aria-label="Actualizar"><span>↻</span></button>
+      </section>
+      <section class="market-strip">
+        <div><span class="muted tiny">INSTRUMENTO</span><strong id="selected-symbol">Selecciona un mercado</strong></div>
+        <div><span class="muted tiny">PRECIO</span><strong id="last-price">—</strong></div>
+        <div><span class="muted tiny">TEMPORALIDAD</span><strong>M1</strong></div>
+      </section>
+      <section class="workspace">
+        <aside class="panel markets-panel">
+          <div class="panel-heading"><h2>Mercados</h2><span class="tiny muted" id="market-count">0</span></div>
+          <label class="search"><span>⌕</span><input id="market-search" type="search" placeholder="Buscar instrumento" autocomplete="off"></label>
+          <div id="market-list" class="market-list"><div class="empty">Los instrumentos aparecerán al conectar el proveedor de datos.</div></div>
+        </aside>
+        <div class="main-column">
+          <section class="panel chart-panel">
+            <div class="panel-heading chart-heading"><div><h2 id="chart-title">Gráfico</h2><span class="tiny muted">Velas M1 · historial real pendiente de conexión</span></div><button id="fullscreen-btn" class="subtle-btn" type="button">Pantalla completa</button></div>
+            <div class="chart-wrap" id="chart-wrap"><canvas id="price-chart" aria-label="Gráfico de velas"></canvas><div class="chart-empty" id="chart-empty"><span class="chart-symbol">⌁</span><strong>Esperando datos del mercado</strong><span>Este gráfico no utiliza precios simulados.</span></div></div>
+            <div class="chart-footer"><span id="chart-status">Sin datos</span><span>Desliza para explorar · Pellizca para ampliar</span></div>
+          </section>
+          <section class="strategy-grid">
+            <article class="panel strategy-card"><div class="panel-heading"><h2>Motor de estructura</h2><span class="tag">INDEPENDIENTE</span></div><p class="muted">Liquidez, pivotes, zonas OB y objetivos estructurales.</p><div class="engine-state"><i></i><span>Configuración pendiente de reglas finales</span></div><button class="wide-btn" data-engine="structure" type="button">Ver configuración</button></article>
+            <article class="panel strategy-card"><div class="panel-heading"><h2>Canal de tres toques</h2><span class="tag">INDEPENDIENTE</span></div><p class="muted">Detección de canal y confirmación de entrada por separado.</p><div class="engine-state"><i></i><span>Configuración pendiente de reglas finales</span></div><button class="wide-btn" data-engine="three-touch" type="button">Ver configuración</button></article>
+          </section>
+          <section class="panel signals-panel"><div class="panel-heading"><h2>Señales</h2><span class="tiny muted">Sin señales falsas</span></div><div id="signals-list" class="empty">Todavía no hay señales confirmadas.</div></section>
+        </div>
+      </section>
+      <section class="panel operations-panel"><div class="panel-heading"><h2>Seguimiento de operaciones</h2><div class="stats"><span>Activas <b id="active-count">0</b></span><span>Ganadas <b id="won-count">0</b></span><span>Perdidas <b id="lost-count">0</b></span></div></div><div id="operations-list" class="empty">Cuando pulses ENTRÉ en una señal, aparecerá aquí.</div></section>
+    </main>
+    <footer>BOTDER · Las señales son informativas. No se envían órdenes al mercado.</footer>
+  </div>
+  <dialog id="engine-dialog" class="engine-dialog"><div class="dialog-head"><h2 id="dialog-title">Motor</h2><button id="dialog-close" class="icon-btn" type="button" aria-label="Cerrar">×</button></div><p id="dialog-copy" class="muted"></p><p class="notice">No se activarán reglas inventadas. Primero se fijan los parámetros exactos de cada motor.</p></dialog>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
