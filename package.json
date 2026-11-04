@@ -1,0 +1,10 @@
+{
+  "name": "ventobot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check src/app.js && node --check src/data/deriv-client.js && node --check src/core/operation-book.js && node --check src/core/candle-utils.js && node --check src/ui/candle-chart.js"
+  }
+}
